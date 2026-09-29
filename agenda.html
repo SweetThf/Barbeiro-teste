@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#130f0a">
+<link rel="manifest" href="manifest.json">
+<title>Agenda — Barbearia Lourenço</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rye&family=Jost:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#130f0a; --panel:#1e170f; --panel2:#251c12; --line:#3c2c1c; --rust:#b8692f; --gold:#c9a15a;
+  --cream:#efe6d8; --muted:#a89484;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;}
+body{margin:0; min-height:100vh; background:var(--bg); color:var(--cream); font-family:'Jost',Arial,sans-serif;}
+h1,h2,h3{font-family:'Rye',Georgia,serif; font-weight:400; color:var(--gold); margin:0;}
+.wrap{max-width:640px; margin:0 auto; padding:20px 16px calc(30px + env(safe-area-inset-bottom,0px));}
+.btn{display:inline-block; border:1px solid var(--gold); color:var(--gold); background:transparent; padding:9px 16px; border-radius:4px; font-size:.85rem; cursor:pointer; font-family:'Jost',sans-serif;}
+.btn.solid{background:var(--rust); border-color:var(--rust); color:var(--cream);}
+.btn.full{width:100%;}
+
+/* login (fallback, primeira vez no aparelho) */
+#loginScreen{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;}
+.login-card{background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:32px 28px; width:100%; max-width:320px; text-align:center;}
+.login-card p{color:var(--muted); font-size:.85rem; margin:0 0 20px;}
+.field{margin-bottom:12px; text-align:left;}
+.field label{display:block; font-size:.76rem; color:var(--gold); margin-bottom:5px;}
+.field input{width:100%; background:var(--bg); border:1px solid var(--line); color:var(--cream); padding:10px 12px; border-radius:4px; font-size:.92rem;}
+.remember{display:flex; align-items:center; gap:8px; font-size:.78rem; color:var(--muted); margin:4px 0 16px;}
+.err{color:#c96a5a; font-size:.8rem; min-height:1.1em; margin-top:8px;}
+#bootScreen{min-height:100vh; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:.85rem;}
+
+/* app */
+#appScreen{display:none;}
+header{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; gap:10px;}
+.tabs{display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;}
+.tabs button{background:var(--panel); border:1px solid var(--line); color:var(--muted); padding:7px 13px; border-radius:20px; font-size:.8rem; cursor:pointer; font-family:'Jost',sans-serif;}
+.tabs button.active{border-color:var(--gold); color:var(--gold);}
+
+/* calendario */
+.cal-header{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;}
+.cal-header button{background:none; border:1px solid var(--line); color:var(--gold); width:32px; height:32px; border-radius:4px; cursor:pointer; font-size:1rem;}
+.cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:5px;}
+.cal-dow{text-align:center; font-size:.68rem; color:var(--muted); padding-bottom:4px;}
+.cal-day{aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  background:var(--panel); border:1px solid var(--line); border-radius:5px; font-size:.85rem; cursor:pointer; position:relative;}
+.cal-day.closed{opacity:.35; cursor:default;}
+.cal-day.empty-cell{visibility:hidden;}
+.cal-day.today{border-color:var(--gold);}
+.cal-day.blocked{background:rgba(201,106,90,.16); border-color:#c96a5a;}
+.cal-day .dot{width:5px; height:5px; border-radius:50%; background:var(--rust); position:absolute; bottom:6px;}
+.block-box{border:1px solid var(--line); border-radius:5px; padding:14px; margin-bottom:14px;}
+.block-row{display:flex; justify-content:space-between; align-items:center; padding:6px 0; font-size:.86rem;}
+.block-row button{font-size:.76rem; padding:5px 11px; border-radius:14px;}
+.block-row button.blocked{background:#c96a5a; border-color:#c96a5a; color:#fff;}
+
+/* dia (dialog) */
+dialog.day{background:var(--panel); color:var(--cream); border:1px solid var(--line); border-radius:6px;
+  max-width:480px; width:94vw; padding:0; margin:auto; max-height:88vh;}
+dialog.day::backdrop{background:rgba(0,0,0,.65);}
+.day-inner{padding:22px 20px; max-height:88vh; overflow-y:auto;}
+.slot{border-top:1px solid var(--line); padding:12px 0;}
+.slot:first-child{border-top:none;}
+.slot .hour{font-family:'Rye',serif; color:var(--gold); font-size:1.05rem;}
+.slot .free{color:var(--muted); font-size:.82rem; margin-top:2px;}
+.card{background:var(--panel2); border:1px solid var(--line); border-radius:5px; padding:12px 14px; margin-top:6px;}
+.card .headline{font-weight:600; font-size:.94rem;}
+.card .line{color:var(--muted); font-size:.83rem; margin-top:4px;}
+.card .line b{color:var(--cream);}
+.card.done{opacity:.5;}
+.card .actions{display:flex; gap:8px; margin-top:10px;}
+.card .actions button{font-size:.76rem; padding:5px 11px; border-radius:14px;}
+</style>
+</head>
+<body>
+
+<div id="bootScreen">Carregando…</div>
+
+<div id="loginScreen" style="display:none;">
+  <div class="login-card">
+    <h1>Agenda</h1>
+    <p>Barbearia Lourenço — primeiro acesso deste aparelho</p>
+    <form id="loginForm">
+      <div class="field"><label>E-mail</label><input type="email" id="loginEmail" required></div>
+      <div class="field"><label>Senha</label><input type="password" id="loginPass" required></div>
+      <label class="remember"><input type="checkbox" id="rememberDevice" checked> lembrar neste aparelho</label>
+      <button type="submit" class="btn solid full">Entrar</button>
+      <p class="err" id="loginErr"></p>
+    </form>
+  </div>
+</div>
+
+<div id="appScreen">
+  <div class="wrap">
+    <header>
+      <h2>Agenda</h2>
+      <button class="btn" id="logoutBtn">Sair deste aparelho</button>
+    </header>
+    <div class="tabs" id="tabs">
+      <button data-f="todos" class="active">Todos</button>
+      <button data-f="Rafael Marques">Rafael</button>
+      <button data-f="Diego Da Silva Lourenço">Diego</button>
+    </div>
+    <div class="cal-header">
+      <button id="prevMonth">‹</button>
+      <h3 id="calTitle"></h3>
+      <button id="nextMonth">›</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+  </div>
+</div>
+
+<dialog id="dayModal" class="day">
+  <div class="day-inner">
+    <h3 id="dayTitle"></h3>
+    <div id="dayList"></div>
+    <button class="btn full" id="closeDay" style="margin-top:16px;">Fechar</button>
+  </div>
+</dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.13.2/firebase-app-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.13.2/firebase-auth-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.13.2/firebase-firestore-compat.js"></script>
+<script>
+/* ⚠️ COLE AQUI o mesmo firebaseConfig do site principal / convite de aniversário */
+var firebaseConfig = {
+  apiKey: "AIzaSyD5iRGiwuiHZhZzBAdcjtQ4X-5sNJgkSe0", authDomain: "barbearia-ab315.firebaseapp.com", projectId: "barbearia-ab315",
+  storageBucket: "barbearia-ab315.firebasestorage.app", messagingSenderId: "65589760855", appId: "1:65589760855:web:0c17763c26e4568589e412"
+};
+firebase.initializeApp(firebaseConfig);
+var auth = firebase.auth();
+var db = firebase.firestore();
+
+var bootScreen = document.getElementById('bootScreen');
+var loginScreen = document.getElementById('loginScreen');
+var appScreen = document.getElementById('appScreen');
+var currentFilter = 'todos';
+var allDocs = [];
+var allBlocks = [];
+var BARBERS = ["Rafael Marques","Diego Da Silva Lourenço"];
+function barberSlug(name){ return name.indexOf('Rafael')===0 ? 'rafael' : 'diego'; }
+var viewYear, viewMonth; // 0-11
+
+/* --- login automático neste aparelho (sem precisar digitar toda vez) --- */
+function tryAutoLogin(){
+  var saved;
+  try{ saved = JSON.parse(localStorage.getItem('lourenco_barber_login') || 'null'); }catch(e){ saved = null; }
+  if(saved && saved.email && saved.pass){
+    auth.signInWithEmailAndPassword(saved.email, saved.pass).catch(function(){
+      try{ localStorage.removeItem('lourenco_barber_login'); }catch(e){}
+      showLogin();
+    });
+  } else {
+    showLogin();
+  }
+}
+function showLogin(){ bootScreen.style.display = 'none'; loginScreen.style.display = 'flex'; }
+
+auth.onAuthStateChanged(function(user){
+  if(user){
+    bootScreen.style.display = 'none'; loginScreen.style.display = 'none';
+    appScreen.style.display = 'block';
+    var now = new Date(); viewYear = now.getFullYear(); viewMonth = now.getMonth();
+    listenAppointments();
+  } else if(bootScreen.style.display !== 'none' || loginScreen.style.display === 'none'){
+    appScreen.style.display = 'none';
+    tryAutoLogin();
+  }
+});
+
+document.getElementById('loginForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var email = document.getElementById('loginEmail').value;
+  var pass = document.getElementById('loginPass').value;
+  var remember = document.getElementById('rememberDevice').checked;
+  document.getElementById('loginErr').textContent = '';
+  auth.signInWithEmailAndPassword(email, pass).then(function(){
+    if(remember){ try{ localStorage.setItem('lourenco_barber_login', JSON.stringify({email:email, pass:pass})); }catch(e){} }
+  }).catch(function(){ document.getElementById('loginErr').textContent = 'E-mail ou senha incorretos.'; });
+});
+document.getElementById('logoutBtn').addEventListener('click', function(){
+  try{ localStorage.removeItem('lourenco_barber_login'); }catch(e){}
+  auth.signOut();
+});
+
+document.getElementById('tabs').addEventListener('click', function(e){
+  if(e.target.tagName !== 'BUTTON') return;
+  currentFilter = e.target.dataset.f;
+  document.querySelectorAll('#tabs button').forEach(function(b){ b.classList.toggle('active', b===e.target); });
+  renderCalendar();
+});
+
+function listenAppointments(){
+  db.collection('agendamentos').onSnapshot(function(snap){
+    allDocs = snap.docs;
+    renderCalendar();
+  }, function(){
+    document.getElementById('calGrid').innerHTML = '<p style="grid-column:1/-1;color:var(--muted)">Não foi possível carregar a agenda. Verifique as regras do Firestore.</p>';
+  });
+  db.collection('bloqueios').onSnapshot(function(snap){
+    allBlocks = snap.docs;
+    renderCalendar();
+  });
+}
+function blocksForDate(iso){
+  return allBlocks.filter(function(d){ return d.data().date === iso; });
+}
+function isBlocked(iso, barber){
+  return allBlocks.some(function(d){ return d.data().date === iso && d.data().barber === barber; });
+}
+
+/* --- horários do dia (40 min) --- */
+function allSlots(){
+  var slots = [];
+  [["09:00","13:00"],["14:00","20:00"]].forEach(function(range){
+    var t = range[0];
+    while(t < range[1]){
+      slots.push(t);
+      var mm = parseInt(t.slice(3),10) + 40, hh = parseInt(t.slice(0,2),10);
+      hh += Math.floor(mm/60); mm = mm % 60;
+      t = String(hh).padStart(2,'0') + ':' + String(mm).padStart(2,'0');
+    }
+  });
+  return slots;
+}
+function docsForDate(iso){
+  return allDocs.filter(function(d){
+    var a = d.data();
+    return a.date === iso && (currentFilter==='todos' || a.barber===currentFilter);
+  });
+}
+
+var MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+function renderCalendar(){
+  document.getElementById('calTitle').textContent = MONTHS[viewMonth] + ' ' + viewYear;
+  var grid = document.getElementById('calGrid');
+  var html = ['D','S','T','Q','Q','S','S'].map(function(d){ return '<div class="cal-dow">'+d+'</div>'; }).join('');
+  var first = new Date(viewYear, viewMonth, 1);
+  var startOffset = first.getDay();
+  var daysInMonth = new Date(viewYear, viewMonth+1, 0).getDate();
+  var todayIso = new Date().toISOString().slice(0,10);
+  for(var i=0;i<startOffset;i++){ html += '<div class="cal-day empty-cell"></div>'; }
+  for(var day=1; day<=daysInMonth; day++){
+    var dateObj = new Date(viewYear, viewMonth, day);
+    var iso = dateObj.getFullYear()+'-'+String(dateObj.getMonth()+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+    var weekday = dateObj.getDay();
+    var closed = (weekday===0 || weekday===1);
+    var count = docsForDate(iso).length;
+    var blocked = currentFilter==='todos'
+      ? blocksForDate(iso).length > 0
+      : isBlocked(iso, currentFilter);
+    var cls = 'cal-day' + (closed?' closed':'') + (iso===todayIso?' today':'') + (blocked?' blocked':'');
+    html += '<div class="'+cls+'"'+(closed?'':' onclick="openDay(\''+iso+'\')"')+'>'+day+(count?'<span class="dot"></span>':'')+'</div>';
+  }
+  grid.innerHTML = html;
+}
+document.getElementById('prevMonth').addEventListener('click', function(){
+  viewMonth--; if(viewMonth<0){viewMonth=11; viewYear--;} renderCalendar();
+});
+document.getElementById('nextMonth').addEventListener('click', function(){
+  viewMonth++; if(viewMonth>11){viewMonth=0; viewYear++;} renderCalendar();
+});
+
+var dayModal = document.getElementById('dayModal');
+function renderBlockBox(iso){
+  var rows = BARBERS.map(function(b){
+    var blocked = isBlocked(iso, b);
+    return '<div class="block-row"><span>'+b.split(' ')[0]+'</span>'+
+      '<button class="'+(blocked?'blocked':'')+'" onclick="toggleBlock(\''+iso+'\',\''+b+'\')">'+
+      (blocked ? 'Bloqueado — liberar' : 'Bloquear o dia') + '</button></div>';
+  }).join('');
+  return '<div class="block-box"><div class="line" style="color:var(--muted);font-size:.8rem;margin-bottom:6px;">Disponibilidade do dia</div>'+rows+'</div>';
+}
+function toggleBlock(iso, barber){
+  var id = iso + '_' + barberSlug(barber);
+  var ref = db.collection('bloqueios').doc(id);
+  if(isBlocked(iso, barber)){
+    ref.delete().then(function(){ openDay(iso); });
+  } else {
+    var temAgendamento = allDocs.some(function(d){ return d.data().date===iso && d.data().barber===barber; });
+    if(temAgendamento && !confirm('Já existe agendamento desse barbeiro nesse dia. Bloquear mesmo assim? (os agendamentos não são cancelados automaticamente)')) return;
+    ref.set({date: iso, barber: barber, blocked: true, createdAt: firebase.firestore.FieldValue.serverTimestamp()})
+      .then(function(){ openDay(iso); });
+  }
+}
+function openDay(iso){
+  var p = iso.split('-');
+  document.getElementById('dayTitle').textContent = p[2]+'/'+p[1]+'/'+p[0];
+  var docs = docsForDate(iso);
+  var byTime = {};
+  docs.forEach(function(d){ byTime[d.data().time] = d; });
+  var html = renderBlockBox(iso) + allSlots().map(function(t){
+    var d = byTime[t];
+    if(!d) return '<div class="slot"><div class="hour">'+t+'</div><div class="free">Livre</div></div>';
+    var a = d.data();
+    var doneClass = a.status==='concluido' ? ' done' : '';
+    return '<div class="slot"><div class="hour">'+t+'</div>'+
+      '<div class="card'+doneClass+'">'+
+        '<div class="headline">'+a.name+' — '+a.service+'</div>'+
+        '<div class="line">📞 <b>'+a.phone+'</b> · '+a.name+' · '+a.service+'</div>'+
+        '<div class="line">Barbeiro: <b>'+a.barber+'</b> · Status: <b>'+(a.status==='concluido'?'concluído':'pendente')+'</b></div>'+
+        '<div class="actions">'+
+          (a.status!=='concluido' ? '<button class="btn" onclick="markDone(\''+d.id+'\')">Concluir</button>' : '')+
+          '<button class="btn" onclick="cancelBooking(\''+d.id+'\')">Cancelar</button>'+
+        '</div>'+
+      '</div></div>';
+  }).join('');
+  document.getElementById('dayList').innerHTML = html;
+  dayModal.showModal();
+}
+document.getElementById('closeDay').addEventListener('click', function(){ dayModal.close(); });
+function markDone(id){ db.collection('agendamentos').doc(id).update({status:'concluido'}).then(function(){ dayModal.close(); }); }
+function cancelBooking(id){ if(confirm('Cancelar este agendamento?')) db.collection('agendamentos').doc(id).delete().then(function(){ dayModal.close(); }); }
+
+tryAutoLogin();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){ /* offline cache é opcional */ });
+  });
+}
+</script>
+</body>
+</html>
