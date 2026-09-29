@@ -38,12 +38,43 @@ h1,h2,h3{font-family:'Rye',Georgia,serif; font-weight:400; color:var(--gold); ma
 
 /* app */
 #appScreen{display:none;}
-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; gap:10px;}
-.tabs{display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;}
-.tabs button{background:var(--panel); border:1px solid var(--line); color:var(--muted); padding:7px 13px; border-radius:20px; font-size:.8rem; cursor:pointer; font-family:'Jost',sans-serif;}
-.tabs button.active{border-color:var(--gold); color:var(--gold);}
+header{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:10px;}
+.today-btn{background:none; border:none; color:var(--gold); font-family:'Rye',serif; font-size:1.3rem; cursor:pointer; display:flex; align-items:center; gap:6px; padding:0;}
+.today-btn .chev{font-size:.85rem; color:var(--muted); font-family:'Jost',sans-serif;}
 
-/* calendario */
+/* faixa da semana */
+.week-strip{display:flex; align-items:center; gap:4px; margin-bottom:16px;}
+.week-strip > button{background:none; border:1px solid var(--line); color:var(--gold); width:26px; height:26px; border-radius:4px; cursor:pointer; flex-shrink:0; font-size:.9rem;}
+.week-days{display:grid; grid-template-columns:repeat(7,1fr); gap:2px; flex:1;}
+.week-day{display:flex; flex-direction:column; align-items:center; padding:4px 0; border-radius:6px; cursor:pointer; border:1px solid transparent;}
+.week-day .dow{font-size:.6rem; color:var(--muted); text-transform:uppercase;}
+.week-day .num{font-size:.85rem; margin-top:3px; width:24px; height:24px; display:flex; align-items:center; justify-content:center; border-radius:50%;}
+.week-day.today .num{border:1px solid var(--gold);}
+.week-day.selected .num{background:var(--rust); color:#fff;}
+.week-day.closed{opacity:.35;}
+.week-day .dotrow{display:flex; gap:2px; margin-top:3px; height:4px;}
+.week-day .dotrow span{width:3px; height:3px; border-radius:50%; background:var(--gold);}
+
+/* colunas dos barbeiros */
+.day-columns{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+.col{min-width:0;}
+.col-head{display:flex; align-items:center; gap:6px; margin-bottom:8px;}
+.col-head .avatar{width:24px; height:24px; border-radius:50%; background:var(--panel2); display:flex; align-items:center; justify-content:center; font-size:.62rem; color:var(--gold); border:1px solid var(--line); flex-shrink:0;}
+.col-head .name{font-size:.8rem; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.col-block-btn{width:100%; font-size:.68rem; padding:5px 6px; border-radius:14px; margin-bottom:10px;}
+.col-block-btn.blocked{background:#c96a5a; border-color:#c96a5a; color:#fff;}
+.appt{background:var(--panel2); border-left:3px solid var(--rust); border-radius:4px; padding:8px 9px; margin-bottom:8px; font-size:.78rem;}
+.appt.done{opacity:.5; border-left-color:var(--muted);}
+.appt .t{color:var(--gold); font-weight:600; font-size:.72rem;}
+.appt .n{margin-top:2px; font-weight:600; font-size:.8rem;}
+.appt .s{color:var(--muted); font-size:.72rem;}
+.appt .p{color:var(--muted); font-size:.68rem; margin-top:2px;}
+.appt .actions{display:flex; gap:5px; margin-top:6px; flex-wrap:wrap;}
+.appt .actions button{font-size:.66rem; padding:3px 7px; border-radius:12px;}
+.col-empty{color:var(--muted); font-size:.74rem; text-align:center; padding:18px 0;}
+.col-closed{color:var(--muted); font-size:.78rem; text-align:center; padding:24px 0; border:1px dashed var(--line); border-radius:6px;}
+
+/* seletor de mês (dialog) */
 .cal-header{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;}
 .cal-header button{background:none; border:1px solid var(--line); color:var(--gold); width:32px; height:32px; border-radius:4px; cursor:pointer; font-size:1rem;}
 .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:5px;}
@@ -53,29 +84,12 @@ header{display:flex; justify-content:space-between; align-items:center; margin-b
 .cal-day.closed{opacity:.35; cursor:default;}
 .cal-day.empty-cell{visibility:hidden;}
 .cal-day.today{border-color:var(--gold);}
-.cal-day.blocked{background:rgba(201,106,90,.16); border-color:#c96a5a;}
 .cal-day .dot{width:5px; height:5px; border-radius:50%; background:var(--rust); position:absolute; bottom:6px;}
-.block-box{border:1px solid var(--line); border-radius:5px; padding:14px; margin-bottom:14px;}
-.block-row{display:flex; justify-content:space-between; align-items:center; padding:6px 0; font-size:.86rem;}
-.block-row button{font-size:.76rem; padding:5px 11px; border-radius:14px;}
-.block-row button.blocked{background:#c96a5a; border-color:#c96a5a; color:#fff;}
 
-/* dia (dialog) */
 dialog.day{background:var(--panel); color:var(--cream); border:1px solid var(--line); border-radius:6px;
   max-width:480px; width:94vw; padding:0; margin:auto; max-height:88vh;}
 dialog.day::backdrop{background:rgba(0,0,0,.65);}
 .day-inner{padding:22px 20px; max-height:88vh; overflow-y:auto;}
-.slot{border-top:1px solid var(--line); padding:12px 0;}
-.slot:first-child{border-top:none;}
-.slot .hour{font-family:'Rye',serif; color:var(--gold); font-size:1.05rem;}
-.slot .free{color:var(--muted); font-size:.82rem; margin-top:2px;}
-.card{background:var(--panel2); border:1px solid var(--line); border-radius:5px; padding:12px 14px; margin-top:6px;}
-.card .headline{font-weight:600; font-size:.94rem;}
-.card .line{color:var(--muted); font-size:.83rem; margin-top:4px;}
-.card .line b{color:var(--cream);}
-.card.done{opacity:.5;}
-.card .actions{display:flex; gap:8px; margin-top:10px;}
-.card .actions button{font-size:.76rem; padding:5px 11px; border-radius:14px;}
 </style>
 </head>
 <body>
@@ -99,28 +113,27 @@ dialog.day::backdrop{background:rgba(0,0,0,.65);}
 <div id="appScreen">
   <div class="wrap">
     <header>
-      <h2>Agenda</h2>
-      <button class="btn" id="logoutBtn">Sair deste aparelho</button>
+      <button class="today-btn" id="todayBtn"><span id="headerLabel">Hoje</span> <span class="chev">⌄</span></button>
+      <button class="btn" id="logoutBtn">Sair</button>
     </header>
-    <div class="tabs" id="tabs">
-      <button data-f="todos" class="active">Todos</button>
-      <button data-f="Rafael Marques">Rafael</button>
-      <button data-f="Diego Da Silva Lourenço">Diego</button>
+    <div class="week-strip">
+      <button id="prevWeek">‹</button>
+      <div class="week-days" id="weekDays"></div>
+      <button id="nextWeek">›</button>
     </div>
+    <div class="day-columns" id="dayColumns"></div>
+  </div>
+</div>
+
+<dialog id="datePickerModal" class="day">
+  <div class="day-inner">
     <div class="cal-header">
       <button id="prevMonth">‹</button>
       <h3 id="calTitle"></h3>
       <button id="nextMonth">›</button>
     </div>
     <div class="cal-grid" id="calGrid"></div>
-  </div>
-</div>
-
-<dialog id="dayModal" class="day">
-  <div class="day-inner">
-    <h3 id="dayTitle"></h3>
-    <div id="dayList"></div>
-    <button class="btn full" id="closeDay" style="margin-top:16px;">Fechar</button>
+    <button class="btn full" id="closeDatePicker" style="margin-top:16px;">Fechar</button>
   </div>
 </dialog>
 
@@ -140,12 +153,14 @@ var db = firebase.firestore();
 var bootScreen = document.getElementById('bootScreen');
 var loginScreen = document.getElementById('loginScreen');
 var appScreen = document.getElementById('appScreen');
-var currentFilter = 'todos';
 var allDocs = [];
 var allBlocks = [];
 var BARBERS = ["Rafael Marques","Diego Da Silva Lourenço"];
 function barberSlug(name){ return name.indexOf('Rafael')===0 ? 'rafael' : 'diego'; }
-var viewYear, viewMonth; // 0-11
+function toIso(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+var todayIso = toIso(new Date());
+var selectedDate = todayIso;
+var pickerYear, pickerMonth;
 
 /* --- login automático neste aparelho (sem precisar digitar toda vez) --- */
 function tryAutoLogin(){
@@ -166,7 +181,7 @@ auth.onAuthStateChanged(function(user){
   if(user){
     bootScreen.style.display = 'none'; loginScreen.style.display = 'none';
     appScreen.style.display = 'block';
-    var now = new Date(); viewYear = now.getFullYear(); viewMonth = now.getMonth();
+    var now = new Date(); pickerYear = now.getFullYear(); pickerMonth = now.getMonth();
     listenAppointments();
   } else if(bootScreen.style.display !== 'none' || loginScreen.style.display === 'none'){
     appScreen.style.display = 'none';
@@ -189,134 +204,162 @@ document.getElementById('logoutBtn').addEventListener('click', function(){
   auth.signOut();
 });
 
-document.getElementById('tabs').addEventListener('click', function(e){
-  if(e.target.tagName !== 'BUTTON') return;
-  currentFilter = e.target.dataset.f;
-  document.querySelectorAll('#tabs button').forEach(function(b){ b.classList.toggle('active', b===e.target); });
-  renderCalendar();
-});
-
 function listenAppointments(){
   db.collection('agendamentos').onSnapshot(function(snap){
     allDocs = snap.docs;
-    renderCalendar();
+    renderAll();
   }, function(){
-    document.getElementById('calGrid').innerHTML = '<p style="grid-column:1/-1;color:var(--muted)">Não foi possível carregar a agenda. Verifique as regras do Firestore.</p>';
+    document.getElementById('dayColumns').innerHTML = '<p style="grid-column:1/-1;color:var(--muted)">Não foi possível carregar a agenda. Verifique as regras do Firestore.</p>';
   });
   db.collection('bloqueios').onSnapshot(function(snap){
     allBlocks = snap.docs;
-    renderCalendar();
+    renderAll();
   });
 }
-function blocksForDate(iso){
-  return allBlocks.filter(function(d){ return d.data().date === iso; });
+function docsForDateBarber(iso, barber){
+  return allDocs.filter(function(d){ return d.data().date === iso && d.data().barber === barber; })
+    .sort(function(a,b){ return a.data().time < b.data().time ? -1 : 1; });
+}
+function docsCountForDate(iso){
+  return allDocs.filter(function(d){ return d.data().date === iso; }).length;
 }
 function isBlocked(iso, barber){
   return allBlocks.some(function(d){ return d.data().date === iso && d.data().barber === barber; });
 }
 
-/* --- horários do dia (40 min) --- */
-function allSlots(){
-  var slots = [];
-  [["09:00","13:00"],["14:00","20:00"]].forEach(function(range){
-    var t = range[0];
-    while(t < range[1]){
-      slots.push(t);
-      var mm = parseInt(t.slice(3),10) + 40, hh = parseInt(t.slice(0,2),10);
-      hh += Math.floor(mm/60); mm = mm % 60;
-      t = String(hh).padStart(2,'0') + ':' + String(mm).padStart(2,'0');
-    }
-  });
-  return slots;
-}
-function docsForDate(iso){
-  return allDocs.filter(function(d){
-    var a = d.data();
-    return a.date === iso && (currentFilter==='todos' || a.barber===currentFilter);
-  });
-}
-
+var DOW_LETTERS = ['D','S','T','Q','Q','S','S'];
 var MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-function renderCalendar(){
-  document.getElementById('calTitle').textContent = MONTHS[viewMonth] + ' ' + viewYear;
-  var grid = document.getElementById('calGrid');
-  var html = ['D','S','T','Q','Q','S','S'].map(function(d){ return '<div class="cal-dow">'+d+'</div>'; }).join('');
-  var first = new Date(viewYear, viewMonth, 1);
-  var startOffset = first.getDay();
-  var daysInMonth = new Date(viewYear, viewMonth+1, 0).getDate();
-  var todayIso = new Date().toISOString().slice(0,10);
-  for(var i=0;i<startOffset;i++){ html += '<div class="cal-day empty-cell"></div>'; }
-  for(var day=1; day<=daysInMonth; day++){
-    var dateObj = new Date(viewYear, viewMonth, day);
-    var iso = dateObj.getFullYear()+'-'+String(dateObj.getMonth()+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
-    var weekday = dateObj.getDay();
-    var closed = (weekday===0 || weekday===1);
-    var count = docsForDate(iso).length;
-    var blocked = currentFilter==='todos'
-      ? blocksForDate(iso).length > 0
-      : isBlocked(iso, currentFilter);
-    var cls = 'cal-day' + (closed?' closed':'') + (iso===todayIso?' today':'') + (blocked?' blocked':'');
-    html += '<div class="'+cls+'"'+(closed?'':' onclick="openDay(\''+iso+'\')"')+'>'+day+(count?'<span class="dot"></span>':'')+'</div>';
-  }
-  grid.innerHTML = html;
+
+function renderAll(){
+  renderHeader();
+  renderWeekStrip();
+  renderColumns();
 }
-document.getElementById('prevMonth').addEventListener('click', function(){
-  viewMonth--; if(viewMonth<0){viewMonth=11; viewYear--;} renderCalendar();
+
+function renderHeader(){
+  var label;
+  if(selectedDate === todayIso) label = 'Hoje';
+  else {
+    var p = selectedDate.split('-');
+    label = p[2]+'/'+p[1]+'/'+p[0];
+  }
+  document.getElementById('headerLabel').textContent = label;
+}
+
+function renderWeekStrip(){
+  var sel = new Date(selectedDate+'T12:00:00');
+  var sunday = new Date(sel); sunday.setDate(sel.getDate() - sel.getDay());
+  var html = '';
+  for(var i=0;i<7;i++){
+    var d = new Date(sunday); d.setDate(sunday.getDate()+i);
+    var iso = toIso(d);
+    var closed = (i===0 || i===1);
+    var cls = 'week-day' + (iso===todayIso?' today':'') + (iso===selectedDate?' selected':'') + (closed?' closed':'');
+    var hasAppt = docsCountForDate(iso) > 0;
+    html += '<div class="'+cls+'" onclick="pickDate(\''+iso+'\')">'+
+      '<span class="dow">'+DOW_LETTERS[i]+'</span>'+
+      '<span class="num">'+d.getDate()+'</span>'+
+      '<span class="dotrow">'+(hasAppt?'<span></span>':'')+'</span>'+
+    '</div>';
+  }
+  document.getElementById('weekDays').innerHTML = html;
+}
+function pickDate(iso){ selectedDate = iso; renderAll(); }
+document.getElementById('prevWeek').addEventListener('click', function(){
+  var d = new Date(selectedDate+'T12:00:00'); d.setDate(d.getDate()-7); selectedDate = toIso(d); renderAll();
 });
-document.getElementById('nextMonth').addEventListener('click', function(){
-  viewMonth++; if(viewMonth>11){viewMonth=0; viewYear++;} renderCalendar();
+document.getElementById('nextWeek').addEventListener('click', function(){
+  var d = new Date(selectedDate+'T12:00:00'); d.setDate(d.getDate()+7); selectedDate = toIso(d); renderAll();
 });
 
-var dayModal = document.getElementById('dayModal');
-function renderBlockBox(iso){
-  var rows = BARBERS.map(function(b){
-    var blocked = isBlocked(iso, b);
-    return '<div class="block-row"><span>'+b.split(' ')[0]+'</span>'+
-      '<button class="'+(blocked?'blocked':'')+'" onclick="toggleBlock(\''+iso+'\',\''+b+'\')">'+
-      (blocked ? 'Bloqueado — liberar' : 'Bloquear o dia') + '</button></div>';
-  }).join('');
-  return '<div class="block-box"><div class="line" style="color:var(--muted);font-size:.8rem;margin-bottom:6px;">Disponibilidade do dia</div>'+rows+'</div>';
-}
-function toggleBlock(iso, barber){
-  var id = iso + '_' + barberSlug(barber);
-  var ref = db.collection('bloqueios').doc(id);
-  if(isBlocked(iso, barber)){
-    ref.delete().then(function(){ openDay(iso); });
-  } else {
-    var temAgendamento = allDocs.some(function(d){ return d.data().date===iso && d.data().barber===barber; });
-    if(temAgendamento && !confirm('Já existe agendamento desse barbeiro nesse dia. Bloquear mesmo assim? (os agendamentos não são cancelados automaticamente)')) return;
-    ref.set({date: iso, barber: barber, blocked: true, createdAt: firebase.firestore.FieldValue.serverTimestamp()})
-      .then(function(){ openDay(iso); });
-  }
-}
-function openDay(iso){
-  var p = iso.split('-');
-  document.getElementById('dayTitle').textContent = p[2]+'/'+p[1]+'/'+p[0];
-  var docs = docsForDate(iso);
-  var byTime = {};
-  docs.forEach(function(d){ byTime[d.data().time] = d; });
-  var html = renderBlockBox(iso) + allSlots().map(function(t){
-    var d = byTime[t];
-    if(!d) return '<div class="slot"><div class="hour">'+t+'</div><div class="free">Livre</div></div>';
-    var a = d.data();
-    var doneClass = a.status==='concluido' ? ' done' : '';
-    return '<div class="slot"><div class="hour">'+t+'</div>'+
-      '<div class="card'+doneClass+'">'+
-        '<div class="headline">'+a.name+' — '+a.service+'</div>'+
-        '<div class="line">📞 <b>'+a.phone+'</b> · '+a.name+' · '+a.service+'</div>'+
-        '<div class="line">Barbeiro: <b>'+a.barber+'</b> · Status: <b>'+(a.status==='concluido'?'concluído':'pendente')+'</b></div>'+
+function renderColumns(){
+  var weekday = new Date(selectedDate+'T12:00:00').getDay();
+  var closed = (weekday===0 || weekday===1);
+  var html = BARBERS.map(function(barber){
+    var initials = barber.split(' ').map(function(w){return w[0];}).slice(0,2).join('');
+    var firstName = barber.split(' ')[0];
+    if(closed){
+      return '<div class="col"><div class="col-head"><span class="avatar">'+initials+'</span><span class="name">'+firstName+'</span></div>'+
+        '<div class="col-closed">Fechado</div></div>';
+    }
+    var blocked = isBlocked(selectedDate, barber);
+    var appts = docsForDateBarber(selectedDate, barber);
+    var apptsHtml = appts.length ? appts.map(function(d){
+      var a = d.data();
+      var doneClass = a.status==='concluido' ? ' done' : '';
+      return '<div class="appt'+doneClass+'">'+
+        '<div class="t">'+a.time+'</div>'+
+        '<div class="n">'+a.name+'</div>'+
+        '<div class="s">'+a.service+'</div>'+
+        '<div class="p">📞 '+a.phone+'</div>'+
         '<div class="actions">'+
           (a.status!=='concluido' ? '<button class="btn" onclick="markDone(\''+d.id+'\')">Concluir</button>' : '')+
           '<button class="btn" onclick="cancelBooking(\''+d.id+'\')">Cancelar</button>'+
         '</div>'+
-      '</div></div>';
+      '</div>';
+    }).join('') : '<div class="col-empty">Nenhum agendamento</div>';
+    return '<div class="col"><div class="col-head"><span class="avatar">'+initials+'</span><span class="name">'+firstName+'</span></div>'+
+      '<button class="btn col-block-btn'+(blocked?' blocked':'')+'" onclick="toggleBlock(\''+selectedDate+'\',\''+barber+'\')">'+
+      (blocked?'Bloqueado — liberar':'Bloquear este dia')+'</button>'+
+      apptsHtml+
+    '</div>';
   }).join('');
-  document.getElementById('dayList').innerHTML = html;
-  dayModal.showModal();
+  document.getElementById('dayColumns').innerHTML = html;
 }
-document.getElementById('closeDay').addEventListener('click', function(){ dayModal.close(); });
-function markDone(id){ db.collection('agendamentos').doc(id).update({status:'concluido'}).then(function(){ dayModal.close(); }); }
-function cancelBooking(id){ if(confirm('Cancelar este agendamento?')) db.collection('agendamentos').doc(id).delete().then(function(){ dayModal.close(); }); }
+
+function toggleBlock(iso, barber){
+  var id = iso + '_' + barberSlug(barber);
+  var ref = db.collection('bloqueios').doc(id);
+  if(isBlocked(iso, barber)){
+    ref.delete();
+  } else {
+    var temAgendamento = allDocs.some(function(d){ return d.data().date===iso && d.data().barber===barber; });
+    if(temAgendamento && !confirm('Já existe agendamento desse barbeiro nesse dia. Bloquear mesmo assim? (os agendamentos não são cancelados automaticamente)')) return;
+    ref.set({date: iso, barber: barber, blocked: true, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
+  }
+}
+function markDone(id){ db.collection('agendamentos').doc(id).update({status:'concluido'}); }
+function cancelBooking(id){ if(confirm('Cancelar este agendamento?')) db.collection('agendamentos').doc(id).delete(); }
+
+/* --- seletor de data (dialog com mês inteiro) --- */
+var datePickerModal = document.getElementById('datePickerModal');
+document.getElementById('todayBtn').addEventListener('click', function(){
+  var d = new Date(selectedDate+'T12:00:00');
+  pickerYear = d.getFullYear(); pickerMonth = d.getMonth();
+  renderPickerCalendar();
+  datePickerModal.showModal();
+});
+document.getElementById('closeDatePicker').addEventListener('click', function(){ datePickerModal.close(); });
+document.getElementById('prevMonth').addEventListener('click', function(){
+  pickerMonth--; if(pickerMonth<0){pickerMonth=11; pickerYear--;} renderPickerCalendar();
+});
+document.getElementById('nextMonth').addEventListener('click', function(){
+  pickerMonth++; if(pickerMonth>11){pickerMonth=0; pickerYear++;} renderPickerCalendar();
+});
+function renderPickerCalendar(){
+  document.getElementById('calTitle').textContent = MONTHS[pickerMonth] + ' ' + pickerYear;
+  var grid = document.getElementById('calGrid');
+  var html = DOW_LETTERS.map(function(d){ return '<div class="cal-dow">'+d+'</div>'; }).join('');
+  var first = new Date(pickerYear, pickerMonth, 1);
+  var startOffset = first.getDay();
+  var daysInMonth = new Date(pickerYear, pickerMonth+1, 0).getDate();
+  for(var i=0;i<startOffset;i++){ html += '<div class="cal-day empty-cell"></div>'; }
+  for(var day=1; day<=daysInMonth; day++){
+    var dateObj = new Date(pickerYear, pickerMonth, day);
+    var iso = toIso(dateObj);
+    var weekday = dateObj.getDay();
+    var closed = (weekday===0 || weekday===1);
+    var count = docsCountForDate(iso);
+    var cls = 'cal-day' + (closed?' closed':'') + (iso===todayIso?' today':'');
+    html += '<div class="'+cls+'" onclick="pickDateFromPicker(\''+iso+'\')">'+day+(count?'<span class="dot"></span>':'')+'</div>';
+  }
+  grid.innerHTML = html;
+}
+function pickDateFromPicker(iso){
+  selectedDate = iso;
+  renderAll();
+  datePickerModal.close();
+}
 
 tryAutoLogin();
 
